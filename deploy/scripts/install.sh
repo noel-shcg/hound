@@ -13,49 +13,63 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Get the script directory and find repository root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+
+echo "Repository directory: $REPO_DIR"
+
 # Configuration
 INSTALL_DIR="/opt/hound"
 HOUND_USER="hound"
 
-echo "Installing dependencies..."
+echo "Updating package lists..."
 apt-get update
+
+echo "Installing dependencies..."
 apt-get install -y \
-    docker.io \
-    docker-compose-plugin \
+    apt-transport-https \
+    ca-certificates \
     curl \
-    git \
+    gnupg \
+    lsb-release \
+    git || true
+
+# Install Docker
+if ! command -v docker &> /dev/null; then
+    echo "Installing Docker..."
+    curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+    sh /tmp/get-docker.sh
+    rm /tmp/get-docker.sh
+    usermod -aG docker "$HOUND_USER" || true
+fi
+
+# Install docker-compose if not available via plugin
+if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
+    echo "Installing docker-compose..."
+    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+fi
+
+# Install other dependencies
+apt-get install -y \
     firefox-esr \
     x11-utils \
     xserver-xorg \
     x11-xserver-utils || true
 
-# Install docker-compose standalone if plugin not available
-if ! command -v docker &> /dev/null; then
-    echo "Docker not found, installing..."
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sh get-docker.sh
-    rm get-docker.sh
-fi
-
-# Check for docker-compose
-if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
-    echo "Installing docker-compose standalone..."
-    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    chmod +x /usr/local/bin/docker-compose
-fi
-
 echo "Creating Hound user..."
 if ! id "$HOUND_USER" &>/dev/null; then
     useradd -r -s /bin/bash -d "$INSTALL_DIR" "$HOUND_USER"
+    usermod -aG docker "$HOUND_USER" || true
 fi
 
 echo "Creating installation directory..."
 mkdir -p "$INSTALL_DIR"
 chown "$HOUND_USER:$HOUND_USER" "$INSTALL_DIR"
 
-echo "Copying Hound files..."
-# This assumes the script is run from the Hound repository
-cp -r . "$INSTALL_DIR/"
+echo "Copying Hound files from $REPO_DIR to $INSTALL_DIR..."
+cp -r "$REPO_DIR"/* "$INSTALL_DIR/"
 chown -R "$HOUND_USER:$HOUND_USER" "$INSTALL_DIR"
 
 echo "Setting up environment file..."
@@ -70,6 +84,9 @@ cp "$INSTALL_DIR/deploy/systemd/hound.service" /etc/systemd/system/
 cp "$INSTALL_DIR/deploy/systemd/hound-kiosk.service" /etc/systemd/system/
 cp "$INSTALL_DIR/deploy/systemd/hound-auto-update.service" /etc/systemd/system/
 cp "$INSTALL_DIR/deploy/systemd/hound-auto-update.timer" /etc/systemd/system/
+chmod +x /etc/systemd/system/hound*.service /etc/systemd/system/hound*.timer
+chmod +x "$INSTALL_DIR/deploy/scripts/auto-update.sh"
+chmod +x "$INSTALL_DIR/deploy/kiosk/hound-kiosk.sh"
 systemctl daemon-reload
 
 echo "Enabling Hound service..."
