@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { busApi, BusStop, BusDeparture } from '../api/bus';
+import { busApi } from '../api/bus';
+import type { BusStop, BusDeparture } from '../api/bus';
 
 interface BusDisplayProps {
   className?: string;

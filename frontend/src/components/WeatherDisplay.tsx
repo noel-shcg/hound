@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { weatherApi, WeatherData } from '../api/weather';
+import { weatherApi } from '../api/weather';
+import type { WeatherData } from '../api/weather';
 
 interface WeatherDisplayProps {
   className?: string;

@@ -1,0 +1,16 @@
+[Unit]
+Description=Hound Auto-Update Service
+After=network-online.target hound.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=hound
+Group=hound
+WorkingDirectory=/opt/hound
+ExecStart=/opt/hound/deploy/scripts/auto-update.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -89,6 +89,4 @@ export const designTokens = {
   },
 };
 
-export type Theme = 'day' | 'evening';
-
-export const getThemeColors = (theme: Theme) => designTokens.colors[theme];
+export const getThemeColors = (theme: 'day' | 'evening') => designTokens.colors[theme];

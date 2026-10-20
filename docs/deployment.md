@@ -129,7 +129,80 @@ Do not configure router port forwarding. Hound is designed for LAN-only access.
 
 ## Updates
 
+### Automatic Updates
+
+Hound includes a comprehensive automatic update system that runs daily via systemd timer.
+
+**Features:**
+- Daily update checks (configurable via systemd timer)
+- Automatic backup before updates
+- Git-based version tracking
+- Health check after update
+- Automatic rollback on failure
+- Update logging to `/var/log/hound-auto-update.log`
+
+**How it works:**
+1. The systemd timer triggers the update script daily
+2. The script checks for new commits on the `main` branch
+3. If updates are available, it creates a backup
+4. Pulls latest changes from GitHub
+5. Rebuilds and restarts Docker containers
+6. Runs health check
+7. Rolls back automatically if health check fails
+
+**Control auto-updates:**
+```bash
+# Check timer status
+sudo systemctl status hound-auto-update.timer
+
+# Enable auto-updates
+sudo systemctl enable hound-auto-update.timer
+
+# Disable auto-updates
+sudo systemctl disable hound-auto-update.timer
+
+# Trigger update manually
+sudo systemctl start hound-auto-update.service
+
+# View update logs
+sudo journalctl -u hound-auto-update -f
+# Or
+sudo tail -f /var/log/hound-auto-update.log
+```
+
+**Configure update schedule:**
+Edit `/etc/systemd/system/hound-auto-update.timer`:
+```ini
+[Timer]
+OnCalendar=daily              # Run daily
+# Or use cron format:
+# OnCalendar=*-*-* 02:00      # Run at 2 AM daily
+# OnCalendar=Mon              # Run every Monday
+# OnCalendar=hourly           # Run every hour
+Persistent=true
+RandomizedDelaySec=3600
+```
+
+Then reload systemd:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart hound-auto-update.timer
+```
+
+**Backend-based updates:**
+The backend also includes an update service that can check for and apply updates via API:
+- `/api/system/updates/status` - Get current update status
+- `/api/system/updates/check` - Check for available updates
+- `/api/system/updates/apply` - Apply available updates
+
+This is controlled by environment variables:
+- `HOUND_AUTO_UPDATE_ENABLED`: Enable/disable backend auto-update job
+- `HOUND_UPDATE_CHANNEL`: Update channel (stable, beta)
+- `HOUND_UPDATE_CHECK_INTERVAL`: How often to check for updates (seconds)
+
 ### Manual Update
+
+If you prefer to update manually:
 
 1. Stop services:
 ```bash
@@ -147,15 +220,6 @@ sudo -u hound git pull
 ```bash
 sudo -u hound docker-compose up -d --build
 ```
-
-### Automatic Updates
-
-Automatic updates are configured via environment variables:
-- `HOUND_AUTO_UPDATE_ENABLED`: Enable/disable automatic updates
-- `HOUND_UPDATE_CHANNEL`: Update channel (stable, beta)
-- `HOUND_UPDATE_CHECK_INTERVAL`: How often to check for updates (seconds)
-
-The update mechanism checks for new releases, downloads images, and applies updates after verification and backup.
 
 ## Backup Configuration
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns';
-import { eventsApi, Event } from '../api/events';
+import { format, isToday, isTomorrow, parseISO } from 'date-fns';
+import { eventsApi } from '../api/events';
+import type { Event } from '../api/events';
 
 interface AgendaProps {
   className?: string;

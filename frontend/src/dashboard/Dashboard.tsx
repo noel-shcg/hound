@@ -8,7 +8,7 @@ import { Agenda } from './Agenda';
 import { Screensaver } from '../components/Screensaver';
 
 export const Dashboard: React.FC = () => {
-  const { theme, colors, designTokens } = useTheme();
+  const { colors, designTokens } = useTheme();
   const [screensaverActive, setScreensaverActive] = useState(false);
   const [lastInteraction, setLastInteraction] = useState(Date.now());
 

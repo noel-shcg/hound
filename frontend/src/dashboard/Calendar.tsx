@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday } from 'date-fns';
-import { eventsApi, Event } from '../api/events';
+import { eventsApi } from '../api/events';
+import type { Event } from '../api/events';
 
 interface CalendarProps {
   className?: string;
@@ -14,12 +15,10 @@ export const Calendar: React.FC<CalendarProps> = ({ className = '', month, year 
   const displayYear = year ?? currentDate.getFullYear();
   
   const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setLoading(true);
         const monthStart = startOfMonth(new Date(displayYear, displayMonth));
         const monthEnd = endOfMonth(new Date(displayYear, displayMonth));
         const data = await eventsApi.list(
@@ -29,8 +28,6 @@ export const Calendar: React.FC<CalendarProps> = ({ className = '', month, year 
         setEvents(data);
       } catch (err) {
         console.error('Failed to load events:', err);
-      } finally {
-        setLoading(false);
       }
     };
 

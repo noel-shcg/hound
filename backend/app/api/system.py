@@ -6,6 +6,7 @@ from typing import Dict
 from ..core.database import get_db
 from ..models.system_status import SystemStatus
 from ..schemas.system import SystemStatusResponse, HealthCheckResponse
+from ..services.update_service import update_service
 
 router = APIRouter()
 
@@ -92,3 +93,21 @@ async def update_component_status(
     
     db.commit()
     return {"message": "Status updated"}
+
+
+@router.get("/updates/status")
+async def get_update_status():
+    """Get current update status."""
+    return update_service.get_update_status()
+
+
+@router.post("/updates/check")
+async def check_for_updates():
+    """Check for available updates."""
+    return update_service.check_for_updates()
+
+
+@router.post("/updates/apply")
+async def apply_update():
+    """Apply available updates."""
+    return update_service.apply_update()

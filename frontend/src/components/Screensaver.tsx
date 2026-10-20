@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { photosApi, Photo } from '../api/photos';
+import { photosApi } from '../api/photos';
+import type { Photo } from '../api/photos';
 
 interface ScreensaverProps {
   className?: string;

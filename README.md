@@ -1,8 +1,20 @@
 # Hound
 
+![Hound](https://img.shields.io/badge/Household-Dashboard-blue)
+![Version](https://img.shields.io/badge/version-0.1.0-green)
+![Python](https://img.shields.io/badge/python-3.11+-blue)
+![React](https://img.shields.io/badge/react-19+-blue)
+![License](https://img.shields.io/badge/license-MIT-orange)
+
 Hound is a self-hosted household dashboard application designed to run on a Linux touchscreen device in a central location in a family home. It provides an attractive, always-available household information display with a separate web management interface for configuring the system.
 
 ## Features
+
+![Dashboard](https://img.shields.io/badge/Dashboard-Touch--friendly-purple)
+![Weather](https://img.shields.io/badge/Weather-Open--Meteo-yellow)
+![Bus](https://img.shields.io/badge/Bus-Bustimes.org-red)
+![Calendar](https://img.shields.io/badge/Calendar-Recurring-green)
+![Screensaver](https://img.shields.io/badge/Screensaver-Photo--slideshow-orange)
 
 - **Dashboard**: Full-screen, touch-friendly display showing:
   - Time and date (UK locale, 24-hour clock)
@@ -47,6 +59,11 @@ Hound consists of:
 The application is designed to run entirely on a modest Linux touchscreen computer. The dashboard and management interface share the same backend services and database.
 
 ## Technology Stack
+
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+![SQLite](https://img.shields.io/badge/SQLite-3+-red)
 
 - **Frontend**: React, TypeScript, Vite
 - **Backend**: Python, FastAPI, Pydantic, SQLAlchemy, Alembic

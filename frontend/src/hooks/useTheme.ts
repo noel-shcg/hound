@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getThemeColors, Theme, designTokens } from '../styles/design-tokens';
+import { getThemeColors, designTokens } from '../styles/design-tokens';
 
 export const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>('day');
+  const [theme, setTheme] = useState<'day' | 'evening'>('day');
 
   useEffect(() => {
     // Check current time and set theme

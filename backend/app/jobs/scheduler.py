@@ -11,6 +11,7 @@ from ..models.system_status import SystemStatus
 from ..services.weather_service import weather_service
 from ..services.bus_service import bus_service
 from ..services.reminder_service import reminder_service
+from ..services.update_service import update_service
 
 
 scheduler = AsyncIOScheduler()
@@ -120,6 +121,55 @@ async def evaluate_reminders_job():
         db.close()
 
 
+async def check_updates_job():
+    """Background job to check for and apply automatic updates."""
+    try:
+        # Check if auto-update is enabled
+        from ..core.config import settings as config_settings
+        if not config_settings.auto_update_enabled:
+            return
+        
+        # Check for updates
+        status = update_service.check_for_updates()
+        
+        if status.get("available"):
+            print("Updates available, applying...")
+            result = update_service.apply_update()
+            
+            if result.get("success"):
+                print("Update applied successfully")
+            else:
+                print(f"Update failed: {result.get('error')}")
+        
+        # Update system status
+        db = SessionLocal()
+        try:
+            update_status = update_service.get_update_status()
+            sys_status = db.query(SystemStatus).filter(SystemStatus.component == "updates").first()
+            if sys_status:
+                sys_status.status = "healthy" if not update_status.get("update_available") else "update_available"
+                sys_status.last_check = datetime.utcnow()
+                sys_status.message = f"Updates available: {update_status.get('update_available')}"
+                sys_status.metadata = str(update_status)
+            else:
+                sys_status = SystemStatus(
+                    component="updates",
+                    status="healthy" if not update_status.get("update_available") else "update_available",
+                    last_check=datetime.utcnow(),
+                    message=f"Updates available: {update_status.get('update_available')}",
+                    metadata=str(update_status)
+                )
+                db.add(sys_status)
+            db.commit()
+        except Exception as e:
+            print(f"Error updating system status: {e}")
+        finally:
+            db.close()
+    
+    except Exception as e:
+        print(f"Error in update check job: {e}")
+
+
 def start_scheduler(settings):
     """Start the background scheduler."""
     # Weather refresh job
@@ -146,6 +196,15 @@ def start_scheduler(settings):
         trigger=IntervalTrigger(hours=1),
         id="evaluate_reminders",
         name="Evaluate recurring reminders",
+        replace_existing=True
+    )
+    
+    # Update check job (run daily)
+    scheduler.add_job(
+        check_updates_job,
+        trigger=IntervalTrigger(seconds=settings.update_check_interval),
+        id="check_updates",
+        name="Check for updates",
         replace_existing=True
     )
     
