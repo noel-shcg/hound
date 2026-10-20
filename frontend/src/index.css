@@ -1,0 +1,414 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+  background: var(--background, #1a1a2e);
+  color: var(--text, #ffffff);
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Dashboard Layout */
+.dashboard {
+  width: 100%;
+  height: 100vh;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto 1fr;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1920px;
+  height: calc(100vh - 4rem);
+}
+
+.dashboard-card {
+  background: var(--surface, #16213e);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Clock Card */
+.clock-card {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.clock-time {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.clock-date {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+  opacity: 0.8;
+}
+
+/* Weather Card */
+.weather-card {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.weather-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.weather-temp {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.weather-condition {
+  font-size: 1.25rem;
+  opacity: 0.9;
+}
+
+.weather-details {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.weather-updated {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+.weather-display.loading,
+.weather-display.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 1.25rem;
+  opacity: 0.7;
+}
+
+.weather-display.stale {
+  border: 2px solid #ff9800;
+}
+
+.weather-warning {
+  color: #ff9800;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Bus Card */
+.bus-card {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  overflow-y: auto;
+}
+
+.bus-stop {
+  margin-bottom: 1.5rem;
+}
+
+.bus-stop:last-child {
+  margin-bottom: 0;
+}
+
+.bus-stop-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.bus-stop-official {
+  font-size: 0.875rem;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.bus-departures {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bus-departure {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+}
+
+.departure-route {
+  font-weight: 600;
+  min-width: 3rem;
+}
+
+.departure-destination {
+  flex: 1;
+}
+
+.departure-time {
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.departure-countdown {
+  font-weight: 600;
+  color: #4caf50;
+}
+
+.no-departures {
+  font-size: 0.875rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.bus-display.loading,
+.bus-display.error,
+.bus-display.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 1.25rem;
+  opacity: 0.7;
+}
+
+/* Calendar Card */
+.calendar-card {
+  grid-column: 1 / 3;
+  grid-row: 2 / 4;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-header {
+  margin-bottom: 1rem;
+}
+
+.calendar-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: 600;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.calendar-day:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.calendar-day.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.calendar-day.today {
+  background: rgba(74, 144, 226, 0.2);
+  border: 2px solid var(--primary, #4A90E2);
+}
+
+.calendar-day-number {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.calendar-event {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+}
+
+.calendar-more {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Agenda Card */
+.agenda-card {
+  grid-column: 3;
+  grid-row: 3;
+  overflow-y: auto;
+}
+
+.agenda-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.agenda-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.agenda-item {
+  padding: 0.75rem;
+  border-left: 4px solid;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+}
+
+.agenda-date {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
+}
+
+.agenda-time {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.agenda-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.agenda-category {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  color: white;
+}
+
+.agenda.loading,
+.agenda.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 1.25rem;
+  opacity: 0.7;
+}
+
+/* Screensaver */
+.screensaver {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  z-index: 9999;
+  cursor: pointer;
+}
+
+.screensaver-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.screensaver-dim-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.screensaver.dimmed .screensaver-image {
+  filter: brightness(0.5);
+}
+
+/* Page */
+.page {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto auto 1fr;
+  }
+  
+  .clock-card {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  
+  .weather-card {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  
+  .bus-card {
+    grid-column: 1 / 3;
+    grid-row: 2;
+  }
+  
+  .calendar-card {
+    grid-column: 1 / 3;
+    grid-row: 3 / 5;
+  }
+  
+  .agenda-card {
+    grid-column: 1 / 3;
+    grid-row: 5;
+  }
+}

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hound-backend
+    volumes:
+      - hound-data:/data
+    environment:
+      - HOUND_SECRET_KEY=${HOUND_SECRET_KEY}
+      - HOUND_DATABASE_PATH=/data/hound.db
+      - HOUND_PHOTO_DIR=/data/photos
+      - HOUND_BACKUP_DIR=/data/backups
+      - HOUND_TIMEZONE=${HOUND_TIMEZONE:-Europe/London}
+      - HOUND_WEATHER_REFRESH_INTERVAL=${HOUND_WEATHER_REFRESH_INTERVAL:-900}
+      - HOUND_BUS_REFRESH_INTERVAL=${HOUND_BUS_REFRESH_INTERVAL:-60}
+      - HOUND_SCREENSAVER_TIMEOUT=${HOUND_SCREENSAVER_TIMEOUT:-60}
+      - HOUND_PHOTO_ROTATION_INTERVAL=${HOUND_PHOTO_ROTATION_INTERVAL:-10}
+      - HOUND_DIMMING_START=${HOUND_DIMMING_START:-22:00}
+      - HOUND_DIMMING_END=${HOUND_DIMMING_END:-07:00}
+      - HOUND_DAY_THEME_START=${HOUND_DAY_THEME_START:-07:00}
+      - HOUND_EVENING_THEME_START=${HOUND_EVENING_THEME_START:-19:00}
+      - HOUND_BACKUP_SCHEDULE=${HOUND_BACKUP_SCHEDULE:-0 2 * * *}
+      - HOUND_BACKUP_RETENTION_DAYS=${HOUND_BACKUP_RETENTION_DAYS:-30}
+      - HOUND_UPDATE_CHANNEL=${HOUND_UPDATE_CHANNEL:-stable}
+      - HOUND_AUTO_UPDATE_ENABLED=${HOUND_AUTO_UPDATE_ENABLED:-true}
+      - HOUND_UPDATE_CHECK_INTERVAL=${HOUND_UPDATE_CHECK_INTERVAL:-86400}
+      - BACKEND_HOST=0.0.0.0
+      - BACKEND_PORT=8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hound-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hound-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - VITE_API_BASE_URL=http://backend:8000
+    restart: unless-stopped
+    networks:
+      - hound-network
+
+volumes:
+  hound-data:
+    driver: local
+
+networks:
+  hound-network:
+    driver: bridge
