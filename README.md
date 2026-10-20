@@ -92,35 +92,87 @@ Hound/
 
 ## Quick Start
 
-### 1. Clone and Configure
+### Option 1: Docker Compose (Recommended)
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/noel-shcg/hound.git
 cd Hound
 
 # Copy environment template
 cp .env.example .env
 
 # Edit .env with your configuration
-# Set initial secure credentials and preferences
-```
+# IMPORTANT: Set a secure HOUND_SECRET_KEY
+nano .env
 
-### 2. Start the Application
-
-```bash
 # Build and start with Docker Compose
 docker-compose up -d
 
-# Wait for services to start (check with docker-compose ps)
+# Wait for services to start
+docker-compose ps
+
+# Access the dashboard
+# Dashboard: http://localhost:3000
+# Management: http://localhost:3000/management
 ```
 
-### 3. Access the Dashboard
+### Option 2: Linux Touchscreen Device (Full Installation)
+
+```bash
+# Clone the repository
+git clone https://github.com/noel-shcg/hound.git /tmp/hound
+cd /tmp/hound
+
+# Run the installation script
+sudo ./deploy/scripts/install.sh
+
+# Configure environment
+sudo nano /opt/hound/.env
+# Set HOUND_SECRET_KEY and other settings
+
+# Start the service
+sudo systemctl start hound
+
+# Enable auto-start on boot
+sudo systemctl enable hound
+
+# Enable kiosk mode (optional)
+sudo systemctl enable --now hound-kiosk
+
+# Check status
+sudo systemctl status hound
+```
+
+### Systemd Commands
+
+```bash
+# Start/stop Hound
+sudo systemctl start hound
+sudo systemctl stop hound
+sudo systemctl restart hound
+
+# Enable/disable auto-start
+sudo systemctl enable hound
+sudo systemctl disable hound
+
+# View logs
+sudo journalctl -u hound -f
+
+# Auto-update management
+sudo systemctl status hound-auto-update.timer
+sudo systemctl enable hound-auto-update.timer
+sudo systemctl disable hound-auto-update.timer
+sudo systemctl start hound-auto-update.service  # Trigger update manually
+sudo journalctl -u hound-auto-update -f  # View update logs
+```
+
+### Access the Dashboard
 
 - **Dashboard**: Open `http://localhost:3000` on the touchscreen device
 - **Management**: Open `http://localhost:3000/management` on any device on your home network
 
-### 4. Initial Setup
+### Initial Setup
 
 1. Create your household credential (PIN or password) on first management access
 2. Configure your weather location via the management interface
