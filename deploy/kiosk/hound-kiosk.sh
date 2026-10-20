@@ -4,10 +4,19 @@
 
 # Configuration
 HOUND_URL="http://localhost:3000"
-BROWSER="firefox"
+
+# Try to find Firefox
+if command -v firefox-esr >/dev/null 2>&1; then
+    BROWSER="firefox-esr"
+elif command -v firefox >/dev/null 2>&1; then
+    BROWSER="firefox"
+else
+    echo "Firefox not found. Please install firefox-esr or firefox."
+    exit 1
+fi
 
 # Kill any existing Firefox instances
-pkill -f "$BROWSER"
+pkill -f "$BROWSER" || true
 
 # Wait a moment for processes to terminate
 sleep 2

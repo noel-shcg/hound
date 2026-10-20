@@ -10,7 +10,7 @@ Group=hound
 WorkingDirectory=/opt/hound
 Environment="DISPLAY=:0"
 Environment="XAUTHORITY=/home/hound/.Xauthority"
-ExecStart=/opt/hound/deploy/kiosk/hound-kiosk.sh
+ExecStart=/bin/bash /opt/hound/deploy/kiosk/hound-kiosk.sh
 Restart=always
 RestartSec=10
 

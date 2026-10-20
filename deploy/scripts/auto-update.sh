@@ -56,7 +56,11 @@ git pull origin main
 
 # Rebuild and restart containers
 log "Rebuilding Docker containers..."
-docker-compose up -d --build
+if command -v docker-compose >/dev/null 2>&1; then
+    docker-compose up -d --build
+else
+    docker compose up -d --build
+fi
 
 # Wait for services to start
 log "Waiting for services to start..."
@@ -74,7 +78,11 @@ else
     git reset --hard HEAD@{1}
     
     # Rebuild containers
-    docker-compose up -d --build
+    if command -v docker-compose >/dev/null 2>&1; then
+        docker-compose up -d --build
+    else
+        docker compose up -d --build
+    fi
     
     log "Rollback completed"
     exit 1

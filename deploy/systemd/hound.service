@@ -7,8 +7,8 @@ Requires=docker.service
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/hound
-ExecStart=/usr/bin/docker-compose -f /opt/hound/docker-compose.yml up -d
-ExecStop=/usr/bin/docker-compose -f /opt/hound/docker-compose.yml down
+ExecStart=/bin/sh -c 'if command -v docker-compose >/dev/null 2>&1; then docker-compose -f /opt/hound/docker-compose.yml up -d; else docker compose -f /opt/hound/docker-compose.yml up -d; fi'
+ExecStop=/bin/sh -c 'if command -v docker-compose >/dev/null 2>&1; then docker-compose -f /opt/hound/docker-compose.yml down; else docker compose -f /opt/hound/docker-compose.yml down; fi'
 TimeoutStartSec=300
 
 [Install]

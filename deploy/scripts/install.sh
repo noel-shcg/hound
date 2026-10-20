@@ -20,11 +20,29 @@ HOUND_USER="hound"
 echo "Installing dependencies..."
 apt-get update
 apt-get install -y \
-    docker \
-    docker-compose \
+    docker.io \
+    docker-compose-plugin \
     curl \
-    firefox \
-    x11-xserver-utils
+    git \
+    firefox-esr \
+    x11-utils \
+    xserver-xorg \
+    x11-xserver-utils || true
+
+# Install docker-compose standalone if plugin not available
+if ! command -v docker &> /dev/null; then
+    echo "Docker not found, installing..."
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
+    rm get-docker.sh
+fi
+
+# Check for docker-compose
+if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
+    echo "Installing docker-compose standalone..."
+    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+fi
 
 echo "Creating Hound user..."
 if ! id "$HOUND_USER" &>/dev/null; then
@@ -59,9 +77,6 @@ systemctl enable hound.service
 
 echo "Enabling auto-update timer..."
 systemctl enable hound-auto-update.timer
-
-echo "Enabling kiosk service (optional)..."
-echo "To enable kiosk mode, run: systemctl enable hound-kiosk.service"
 
 echo ""
 echo "Installation complete!"
